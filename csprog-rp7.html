@@ -1,0 +1,195 @@
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<META http-equiv="Content-Style-Type" content="text/css">
+<LINK rel="stylesheet" href="../lib/css/prog-standard.css" type="text/css">
+<script src="../lib/codeptfy/run_prettify.js"></script>
+<LINK rel="stylesheet" href="../lib/codeptfy/codeptfy-prog-standard.css" type="text/css">
+<title>課題rp7(レポート課題)</title>
+</head>
+<body bgcolor="white">
+<h1>課題rp7(レポート課題)</h1>
+
+<UL>
+<LI>目的：Javajx の GUI 作成をもう少し楽にしてみる
+</UL>
+
+<H1>課題: javafx による簡易ゲームに向けた初期インタフェース</H1>
+
+
+<H2>Step 0: サンプルを動かしてみる</H2>
+<UL>
+<LI>まず，ex で利用した，Chara.java, Param.java があるフォルダで以下の２つのファイルを準備してください．
+<ul>
+  <li>rp7_0.java
+<pre class="prettyprint lang-java linenums">
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+
+public class Rp7_0 extends Application {
+    Stage stage;
+    
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+        primaryStage.setTitle("RP7 GAME");
+        Pane myPane_top = (Pane)FXMLLoader.load(getClass().getResource("scene1.fxml"));
+        Scene myScene = new Scene(myPane_top);
+        primaryStage.setScene(myScene);
+        primaryStage.show();
+    }
+    
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+</pre>
+  <li>scene1.fxml
+<pre class="prettyprint lang-java linenums">
+&lt;?xml version="1.0" encoding="UTF-8"?>
+
+&lt;?import javafx.scene.control.*?>
+&lt;?import java.lang.*?>
+&lt;?import javafx.scene.layout.*?>
+
+
+&lt;BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   &lt;top>
+      &lt;Label text="Good Morning" BorderPane.alignment="CENTER" />
+   &lt;/top>
+   &lt;left>
+      &lt;Label text="Good Morning" BorderPane.alignment="CENTER" />
+   &lt;/left>
+   &lt;right>
+      &lt;Label text="Good Morning" BorderPane.alignment="CENTER" />
+   &lt;/right>
+   &lt;center>
+      &lt;Label text="Good Morning" BorderPane.alignment="CENTER" />
+   &lt;/center>
+   &lt;bottom>
+      &lt;Label text="Good Morning" BorderPane.alignment="CENTER" />
+   &lt;/bottom>
+&lt;/BorderPane>
+</pre>
+</ul>
+
+<li>scene1.fxml に関しては，1行目の先頭に空白があるとエラーとなるので注意してください．
+<pre class="prettyprint lang-java linenums">
+[ここに空白があるとだめ！] &lt;?xml version="1.0" encoding="UTF-8"?>
+</pre>
+<li>このように，FXML という記述法を用いると，画面UIをプログラムではなくデータで記述できます．このような手法を用いると，読み込む FXML ファイルを変えるだけで，表示される UI を変更することができます．
+<li>以下に４つほど別のレイアウトの FXML ファイルを用意しました．以下の4つのファイルをダウンロードし，Rp7_0 で読み込んでいる FXML のファイル名をそれぞれのファイルに変えたときにどんな実行がされるか確認してみてください．その際は，各 FXML の内容を エディタで表示しながら，どういった記述で画面に何が出ているのかを観察してください．
+<ul>
+<li><a href="scene2.fxml">scene2.fxml</a>
+<li><a href="scene3.fxml">scene3.fxml</a>
+<li><a href="scene4.fxml">scene4.fxml</a>
+<li><a href="scene5.fxml">scene5.fxml</a>
+</ul>
+
+</ul>
+</UL>
+
+<h2>Step 1: もう少しGAME っぽいものを</h2>
+
+<h3>Step 1-1: 検索の実装</h3>
+<ul>
+<li>まずは以下のプログラムとデータをダウンロードしてください
+<ul>
+  <li><a href="scene6.fxml">scene6.fxml</a>
+  <li><a href="CharaCollection.java">CharaCollection.java</a>
+  <li><a href="CharaList.java">CharaList.java</a>
+  <li><a href="Scene6Controller.java">Scene6Controller.java</a>
+</ul>
+
+<li>Rp7_0.java の fxml を読み込んでいるところを，scene6.fxml に変えてください．
+
+<pre class="shell">
+$ javac CharaCollection.java
+$ javac CharaList.java
+$ javac Scene6Controller.java
+$ javac Rp7_0.java
+$ java Rp7_0
+</pre>
+
+<li>このようなアプリケーションを作成する際は，Model(データの構造とデータに対する操作を定義する), View(画面の見え方を定義する)，Controller(マウスやキーボードその他のイベントが発生したときに何をするか定義する) を意識して分離する手法が好まれます(MVCモデル)．
+<li>この課題でも完全ではないですが意識して作成しています．Model は，Chara.java, Param.java, CharaCollection.java, CharaList.java,  View は scene6.fxml, Rp7_0.java, Controller は Scene6Controller.java で記述されています(が，まだ分離できていない部分も存在します)．<br>
+</ul>
+
+<h3>Step 1-2: 動かしてみてから，キャラが増えるようにしてみる</h3>
+<ul>
+
+  <li> CharaCollection.java にキャラクターリストが定義されています．起動するとその中からランダムで3人選びます(重複可能性あり)<br>
+  <img src="ex7/rp7_0.png" width="423" height="401" />
+  <li> Bar を押すと何故かキャラクターが増えます
+  <li> Battle を押すと何故かHPがランダムで下がります
+  <li> Inn を押すと何故かHPが回復します．
+
+  <li> 課題１：CharaList.java, CharaCollection.java をよく読んだうえで，java の ArrayList について調査し，新しいキャラクタをどのように増やしているのかまとめてください(検討・考察項目へ記載)
+  <li> 課題２：Battle での HP 減少がいまランダムなので，DEF, LUK などのパラメータによってHP増減が変わる(DEF が多いようが減りが少ない，LUKが高いとたまにダメージを受けない) ようにしてみてください．
+  <li> 課題３：お金というパラメータを別途用意し，Battle をするとお金が増えて，Inn に止まるとお金が増えるようにしてみてください．お金は，System.out.println() でコンソールに出ればOKです．<br>
+       (発展) scene6.fxml を改良し，お金パラメータもGUI上に出るようにしてみてください．
+
+  <LI> ここまでで提出する人は，以下を提出すればよい．ただし，今回の課題は提出の際，提出システム上で javafx が利用できないため，コンパイルに失敗しますが，手元で問題なく動いているならそのまま(エラー多数) でOKです．
+    <UL>
+      <LI>提出するプログラム: ここで最後にコンパイルしたプログラム(Javaソースファイル)
+      <LI>提出する実行結果: ここでコンパイルしたプログラムの実行結果
+      <LI>検討・考察事項: 無理に考察はしなくていいので，どのあたりが難しかったか，感想を代わりにここへ．(発展:今回の課題から，オブジェクトを使ったプログラミングの利点と注意点を考察せよ．特に，利点がどこにあると思うか？うまく書けたら加点する．ただし，Wikipediaとかからコピペして知らん顔するのは厳禁．「わからない」の場合は感想として扱う(=それ自体で減点とはしない)ので，(点数は加点されないかもしれないが)素直にそう書いてみてもよい．)
+    </UL>
+  </UL>
+
+</ul>
+
+<h3>(発展)Step 1-3: Party を実装してみる</h3>
+<ul>
+<li>現時点では６つ以上になると7人目以降は表示もされない．
+<li>Party.java で クラス Party を新規に作成し，キャラが７人以上になった場合は，画面に出る６人を任意に選べるようにしてみてください．
+  <LI> ここまでで提出する人は，以下を提出すればよい．ただし，今回の課題は提出の際，提出システム上で javafx が利用できないため，コンパイルに失敗しますが，手元で問題なく動いているならそのまま(エラー多数) でOKです．
+    <UL>
+      <LI>提出するプログラム: ここで最後にコンパイルしたプログラム(Javaソースファイル)
+      <LI>提出する実行結果: ここでコンパイルしたプログラムの実行結果
+      <LI>検討・考察事項: 無理に考察はしなくていいので，どのあたりが難しかったか，感想を代わりにここへ．(発展:今回の課題から，オブジェクトを使ったプログラミングの利点と注意点を考察せよ．特に，利点がどこにあると思うか？うまく書けたら加点する．ただし，Wikipediaとかからコピペして知らん顔するのは厳禁．「わからない」の場合は感想として扱う(=それ自体で減点とはしない)ので，(点数は加点されないかもしれないが)素直にそう書いてみてもよい．)
+    </UL>
+</ul>
+
+<h2>Step 2: (発展)よりゲームっぽくしてみる</h2>
+<h3>Step 2-1: (発展) Battle の際に敵が出てきて戦っているふうな雰囲気を出す</h3>
+<ul>
+<li>いまは，全キャラのHPがランダムで減るだけである．しかし，Chara型には，STR, DEF, LUK の各パラメータがあるので，Enemy型の 仮想敵を用意し，STR DEF LUK から一回のダメージを出してHP から引くような実装をしてみよ．
+  <LI> ここまでで提出する人は，以下を提出すればよい
+    <UL>
+      <LI>提出するプログラム: ここで最後にコンパイルしたプログラム(Javaソースファイル)
+      <LI>提出する実行結果: ここでコンパイルしたプログラムの実行結果
+      <LI>検討・考察事項: 無理に考察はしなくていいので，どのあたりが難しかったか，感想を代わりにここへ．(発展:今回の課題から，オブジェクトを使ったプログラミングの利点と注意点を考察せよ．特に，利点がどこにあると思うか？うまく書けたら加点する．ただし，Wikipediaとかからコピペして知らん顔するのは厳禁．「わからない」の場合は感想として扱う(=それ自体で減点とはしない)ので，(点数は加点されないかもしれないが)素直にそう書いてみてもよい．)
+    </UL>
+  </UL>
+</ul>
+
+<h2>Step 3: (発展)もっとよりゲームっぽくしてみる</h2>
+<ul>
+<li>ここまで来たら自由です．楽しげなゲームっぽいものを作ってみてください．
+<li>FXML は小規模なら手書きでいいですが，大規模になると GUI で作成した方がいいです．Oracle で，<a href="http://www.oracle.com/technetwork/java/javase/downloads/javafxscenebuilder-info-2157684.html">javafx Scene Builder</a> というツールが公開されています．GUI操作で FXML を構築できるツールです．こちらも利用してみてください．
+  <LI> ここまでで提出する人は，以下を提出すればよい
+    <UL>
+      <LI>提出するプログラム: ここで最後にコンパイルしたプログラム(Javaソースファイル)
+      <LI>提出する実行結果: ここでコンパイルしたプログラムの実行結果
+      <LI>検討・考察事項: 無理に考察はしなくていいので，どのあたりが難しかったか，感想を代わりにここへ．(発展:今回の課題から，オブジェクトを使ったプログラミングの利点と注意点を考察せよ．特に，利点がどこにあると思うか？うまく書けたら加点する．ただし，Wikipediaとかからコピペして知らん顔するのは厳禁．「わからない」の場合は感想として扱う(=それ自体で減点とはしない)ので，(点数は加点されないかもしれないが)素直にそう書いてみてもよい．)
+    </UL>
+  </UL>
+</ul>
+
+<FONT COLOR="white">これでは課題が足らないという人は，ぜひスタッフまで申し出て下さい．</FONT>
+
+<hr>
+
+
+<a href="../index.html">戻る</a>
+</body>
+</html>
+j
